@@ -4,13 +4,7 @@ import { withRouter, Route, Switch, Redirect } from "react-router-dom";
 import { Voxel } from "./index";
 
 class Routes extends Component {
-  componentDidMount() {
-    this.props.loadInitialData();
-  }
-
   render() {
-    const { isLoggedIn, isAdmin } = this.props;
-
     return (
       <Switch>
         <Route exact path="/home" component={Voxel} />
