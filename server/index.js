@@ -5,7 +5,7 @@ const compression = require('compression')
 
 const PORT = process.env.PORT || 8080
 const app = express()
-const socketio = require('socket.io')
+// const socketio = require('socket.io')
 const db = require('./db')
 module.exports = app
 
@@ -43,7 +43,7 @@ const startListening = () => {
     console.log(`Listening on port ${PORT}`)
   )
 
-  const io = socketio(server)
+  // const io = socketio(server)
   require('./socket')(io)
 }
 
