@@ -1,11 +1,20 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import * as THREE from "three";
-import Info from "./Info";
+import { fetchBlocks, setBlock } from "../store/blocks";
 const OrbitControls = require("three-orbit-controls")(THREE);
 
 function distanceFromOrigin(v) {
   return Math.sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
+}
+
+function coords(v) {
+  const p = v.position;
+  return {
+    xPos: Math.floor(p.x / 16 + 9.5),
+    yPos: Math.floor(p.y / -16 + 19.5),
+    zPos: Math.floor(p.z / 16 + 9.5)
+  };
 }
 
 class Voxel extends Component {
@@ -21,7 +30,7 @@ class Voxel extends Component {
 
     this.blockSize = 16;
     this.cameraSpeed = 5;
-    this.zoomLimit = 800;
+    this.zoomLimit = 1500;
 
     this.camera;
     this.controls;
@@ -56,7 +65,7 @@ class Voxel extends Component {
   }
 
   onDocumentMouseMove(event) {
-    // event.preventDefault();
+    event.preventDefault();
     this.mouse.set(
       (event.clientX / window.innerWidth) * 2 - 1,
       -(event.clientY / window.innerHeight) * 2 + 1
@@ -78,9 +87,6 @@ class Voxel extends Component {
   }
 
   onDocumentMouseDown(event) {
-    console.log(event.target)
-    // event.preventDefault();
-
     if (event.ctrlKey) {
       this.camera.rotation.y += 0.1;
     }
@@ -92,14 +98,14 @@ class Voxel extends Component {
     this.raycaster.setFromCamera(this.mouse, this.camera);
     let intersects = this.raycaster.intersectObjects(this.objects);
     if (intersects.length > 0) {
-      console.log(event);
       let intersect = intersects[0];
       switch (event.which) {
         case 1: {
           // left
           if (intersect.object !== this.plane) {
             this.scene.remove(intersect.object);
-            console.log(intersect.object.position);
+            // TODO removing blocks
+            coords(intersect.object);
             this.objects.splice(this.objects.indexOf(intersect.object), 1);
           }
           break;
@@ -107,14 +113,14 @@ class Voxel extends Component {
         case 3: {
           // right
           let voxel = new THREE.Mesh(this.cubeGeo, this.cubeMaterial);
-          console.log(voxel.position);
           voxel.position.copy(intersect.point).add(intersect.face.normal);
+          // TODO adding blocks
           voxel.position
             .divideScalar(this.blockSize)
             .floor()
             .multiplyScalar(this.blockSize)
             .addScalar(this.blockSize / 2);
-          console.log(voxel.position);
+          this.props.setBlock({ ...coords(voxel), type: "stone" });
           this.scene.add(voxel);
           this.objects.push(voxel);
           break;
@@ -155,6 +161,9 @@ class Voxel extends Component {
     this.camera.lookAt(0, 0, 0);
 
     this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+    this.controls.minDistance = 10;
+    this.controls.maxDistance = this.zoomLimit;
+
     this.controls.target.set(0, 0, 0);
     this.controls.update();
 
@@ -222,17 +231,35 @@ class Voxel extends Component {
     let directionalLight = new THREE.DirectionalLight(0xffffff);
     directionalLight.position.set(1, 0.75, 0.5).normalize();
     this.scene.add(directionalLight);
-    document.body.appendChild(this.renderer.domElement);
 
+    for (let block of this.props.blocks) {
+      const voxel = new THREE.Mesh(this.cubeGeo, this.cubeMaterial);
+      const pos = new THREE.Vector3(
+        block.xPos - 10,
+        block.yPos *-1 +19,
+        block.zPos - 10
+      );
+      voxel.position
+        .divideScalar(this.blockSize)
+        .floor()
+        .add(pos)
+        .multiplyScalar(this.blockSize)
+        .addScalar(this.blockSize / 2);
+      console.log(voxel.position)
+      this.scene.add(voxel);
+      this.objects.push(voxel);
+    }
+
+    document.body.appendChild(this.renderer.domElement);
     document.addEventListener("mousemove", this.onDocumentMouseMove, false);
     document.addEventListener("mousedown", this.onDocumentMouseDown, false);
     document.addEventListener("contextmenu", event => event.preventDefault());
     window.addEventListener("resize", this.onWindowResize, false);
   }
 
-  componentDidMount() {
+  async componentDidMount() {
+    await this.props.load();
     this.init();
-    // this.renderThree();
     this.animate();
   }
 
@@ -247,14 +274,14 @@ class Voxel extends Component {
 
 const mapProps = state => {
   return {
-    // blocks:state.blocks
+    blocks: state.blocks
   };
 };
 
 const mapDispatch = dispatch => {
   return {
-    //   load : ()=>dispatch(fetchBlocks()),
-    //   setBlock : (block) => dispatch(setBlock(block)),
+    load: () => dispatch(fetchBlocks()),
+    setBlock: block => dispatch(setBlock(block))
     //   removeBlock : (pos) => dispatch(setBlock({...pos,type:"air"}))
   };
 };

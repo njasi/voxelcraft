@@ -231,8 +231,14 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var react_redux__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-redux */ "./node_modules/react-redux/es/index.js");
 /* harmony import */ var three__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! three */ "./node_modules/three/build/three.module.js");
-/* harmony import */ var _Info__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Info */ "./client/components/Info.js");
+/* harmony import */ var _store_blocks__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../store/blocks */ "./client/store/blocks.js");
 function _typeof(obj) { if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(source, true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
@@ -261,6 +267,15 @@ function distanceFromOrigin(v) {
   return Math.sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
 }
 
+function coords(v) {
+  var p = v.position;
+  return {
+    xPos: Math.floor(p.x / 16 + 9.5),
+    yPos: Math.floor(p.y / -16 + 19.5),
+    zPos: Math.floor(p.z / 16 + 9.5)
+  };
+}
+
 var Voxel =
 /*#__PURE__*/
 function (_Component) {
@@ -281,7 +296,7 @@ function (_Component) {
     _this.animate = _this.animate.bind(_assertThisInitialized(_this));
     _this.blockSize = 16;
     _this.cameraSpeed = 5;
-    _this.zoomLimit = 800;
+    _this.zoomLimit = 1500;
     _this.camera;
     _this.controls;
     _this.scene;
@@ -320,7 +335,7 @@ function (_Component) {
   }, {
     key: "onDocumentMouseMove",
     value: function onDocumentMouseMove(event) {
-      // event.preventDefault();
+      event.preventDefault();
       this.mouse.set(event.clientX / window.innerWidth * 2 - 1, -(event.clientY / window.innerHeight) * 2 + 1);
       this.raycaster.setFromCamera(this.mouse, this.camera);
       var intersects = this.raycaster.intersectObjects(this.objects);
@@ -335,8 +350,6 @@ function (_Component) {
   }, {
     key: "onDocumentMouseDown",
     value: function onDocumentMouseDown(event) {
-      console.log(event.target); // event.preventDefault();
-
       if (event.ctrlKey) {
         this.camera.rotation.y += 0.1;
       }
@@ -346,7 +359,6 @@ function (_Component) {
       var intersects = this.raycaster.intersectObjects(this.objects);
 
       if (intersects.length > 0) {
-        console.log(event);
         var intersect = intersects[0];
 
         switch (event.which) {
@@ -354,8 +366,9 @@ function (_Component) {
             {
               // left
               if (intersect.object !== this.plane) {
-                this.scene.remove(intersect.object);
-                console.log(intersect.object.position);
+                this.scene.remove(intersect.object); // TODO removing blocks
+
+                coords(intersect.object);
                 this.objects.splice(this.objects.indexOf(intersect.object), 1);
               }
 
@@ -366,10 +379,12 @@ function (_Component) {
             {
               // right
               var voxel = new three__WEBPACK_IMPORTED_MODULE_2__["Mesh"](this.cubeGeo, this.cubeMaterial);
-              console.log(voxel.position);
-              voxel.position.copy(intersect.point).add(intersect.face.normal);
+              voxel.position.copy(intersect.point).add(intersect.face.normal); // TODO adding blocks
+
               voxel.position.divideScalar(this.blockSize).floor().multiplyScalar(this.blockSize).addScalar(this.blockSize / 2);
-              console.log(voxel.position);
+              this.props.setBlock(_objectSpread({}, coords(voxel), {
+                type: "stone"
+              }));
               this.scene.add(voxel);
               this.objects.push(voxel);
               break;
@@ -405,6 +420,8 @@ function (_Component) {
       this.camera.position.set(this.blockSize * 18, this.blockSize * 18, this.blockSize * 18);
       this.camera.lookAt(0, 0, 0);
       this.controls = new OrbitControls(this.camera, this.renderer.domElement);
+      this.controls.minDistance = 10;
+      this.controls.maxDistance = this.zoomLimit;
       this.controls.target.set(0, 0, 0);
       this.controls.update();
       this.scene = new three__WEBPACK_IMPORTED_MODULE_2__["Scene"]();
@@ -446,6 +463,35 @@ function (_Component) {
       var directionalLight = new three__WEBPACK_IMPORTED_MODULE_2__["DirectionalLight"](0xffffff);
       directionalLight.position.set(1, 0.75, 0.5).normalize();
       this.scene.add(directionalLight);
+      var _iteratorNormalCompletion = true;
+      var _didIteratorError = false;
+      var _iteratorError = undefined;
+
+      try {
+        for (var _iterator = this.props.blocks[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+          var block = _step.value;
+          var voxel = new three__WEBPACK_IMPORTED_MODULE_2__["Mesh"](this.cubeGeo, this.cubeMaterial);
+          var pos = new three__WEBPACK_IMPORTED_MODULE_2__["Vector3"](block.xPos - 10, block.yPos * -1 + 19, block.zPos - 10);
+          voxel.position.divideScalar(this.blockSize).floor().add(pos).multiplyScalar(this.blockSize).addScalar(this.blockSize / 2);
+          console.log(voxel.position);
+          this.scene.add(voxel);
+          this.objects.push(voxel);
+        }
+      } catch (err) {
+        _didIteratorError = true;
+        _iteratorError = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion && _iterator["return"] != null) {
+            _iterator["return"]();
+          }
+        } finally {
+          if (_didIteratorError) {
+            throw _iteratorError;
+          }
+        }
+      }
+
       document.body.appendChild(this.renderer.domElement);
       document.addEventListener("mousemove", this.onDocumentMouseMove, false);
       document.addEventListener("mousedown", this.onDocumentMouseDown, false);
@@ -457,9 +503,23 @@ function (_Component) {
   }, {
     key: "componentDidMount",
     value: function componentDidMount() {
-      this.init(); // this.renderThree();
+      return regeneratorRuntime.async(function componentDidMount$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              _context.next = 2;
+              return regeneratorRuntime.awrap(this.props.load());
 
-      this.animate();
+            case 2:
+              this.init();
+              this.animate();
+
+            case 4:
+            case "end":
+              return _context.stop();
+          }
+        }
+      }, null, this);
     }
   }, {
     key: "render",
@@ -478,14 +538,20 @@ function (_Component) {
 }(react__WEBPACK_IMPORTED_MODULE_0__["Component"]);
 
 var mapProps = function mapProps(state) {
-  return {// blocks:state.blocks
+  return {
+    blocks: state.blocks
   };
 };
 
 var mapDispatch = function mapDispatch(dispatch) {
-  return {//   load : ()=>dispatch(fetchBlocks()),
-    //   setBlock : (block) => dispatch(setBlock(block)),
-    //   removeBlock : (pos) => dispatch(setBlock({...pos,type:"air"}))
+  return {
+    load: function load() {
+      return dispatch(Object(_store_blocks__WEBPACK_IMPORTED_MODULE_3__["fetchBlocks"])());
+    },
+    setBlock: function setBlock(block) {
+      return dispatch(Object(_store_blocks__WEBPACK_IMPORTED_MODULE_3__["setBlock"])(block));
+    } //   removeBlock : (pos) => dispatch(setBlock({...pos,type:"air"}))
+
   };
 };
 
@@ -597,55 +663,80 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 var GOT_BLOCKS = "GOT_BLOCKS";
 var BLOCK_WAS_SET = "BLOCK_WAS_SET";
 var gotBlocks = function gotBlocks(blocks) {
-  type: GOT_BLOCKS, blocks;
+  return {
+    type: GOT_BLOCKS,
+    blocks: blocks
+  };
 };
 var blockWasSet = function blockWasSet(block) {
-  type: BLOCK_WAS_SET, block;
+  return {
+    type: BLOCK_WAS_SET,
+    block: block
+  };
 };
 var fetchBlocks = function fetchBlocks() {
   return function _callee(dispatch) {
-    var _axios$get, data;
+    var _ref, data;
 
     return regeneratorRuntime.async(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
-            try {
-              _axios$get = axios__WEBPACK_IMPORTED_MODULE_0___default.a.get("/api/blocks"), data = _axios$get.data;
-              dispatch(blockWasSet(data));
-            } catch (err) {
-              react_toastify__WEBPACK_IMPORTED_MODULE_1__["toast"].error("There was an error placing the block.");
-            }
+            _context.prev = 0;
+            _context.next = 3;
+            return regeneratorRuntime.awrap(axios__WEBPACK_IMPORTED_MODULE_0___default.a.get("/api/blocks"));
 
-          case 1:
+          case 3:
+            _ref = _context.sent;
+            data = _ref.data;
+            console.log("BLOCK DATA:\t", data);
+            dispatch(gotBlocks(data));
+            _context.next = 12;
+            break;
+
+          case 9:
+            _context.prev = 9;
+            _context.t0 = _context["catch"](0);
+            react_toastify__WEBPACK_IMPORTED_MODULE_1__["toast"].error("There was an error loading the blocks..." + _context.t0);
+
+          case 12:
           case "end":
             return _context.stop();
         }
       }
-    });
+    }, null, null, [[0, 9]]);
   };
 };
 var setBlock = function setBlock(block) {
   return function _callee2(dispatch) {
-    var _axios$put, data;
+    var _ref2, data;
 
     return regeneratorRuntime.async(function _callee2$(_context2) {
       while (1) {
         switch (_context2.prev = _context2.next) {
           case 0:
-            try {
-              _axios$put = axios__WEBPACK_IMPORTED_MODULE_0___default.a.put("/api/blocks", block), data = _axios$put.data;
-              dispatch(gotBlocks(data));
-            } catch (err) {
-              react_toastify__WEBPACK_IMPORTED_MODULE_1__["toast"].error("There was an error getting the cube.");
-            }
+            _context2.prev = 0;
+            _context2.next = 3;
+            return regeneratorRuntime.awrap(axios__WEBPACK_IMPORTED_MODULE_0___default.a.post("/api/blocks", block));
 
-          case 1:
+          case 3:
+            _ref2 = _context2.sent;
+            data = _ref2.data;
+            dispatch(gotBlocks(data));
+            _context2.next = 11;
+            break;
+
+          case 8:
+            _context2.prev = 8;
+            _context2.t0 = _context2["catch"](0);
+            react_toastify__WEBPACK_IMPORTED_MODULE_1__["toast"].error("There was an error placing the block.");
+
+          case 11:
           case "end":
             return _context2.stop();
         }
       }
-    });
+    }, null, null, [[0, 8]]);
   };
 };
 var initialState = {};
@@ -44375,7 +44466,7 @@ function warning(message) {
 /*!***************************************************************!*\
   !*** ./node_modules/react-router-dom/esm/react-router-dom.js ***!
   \***************************************************************/
-/*! exports provided: BrowserRouter, HashRouter, Link, NavLink, MemoryRouter, Prompt, Redirect, Route, Router, StaticRouter, Switch, __RouterContext, generatePath, matchPath, useHistory, useLocation, useParams, useRouteMatch, withRouter */
+/*! exports provided: MemoryRouter, Prompt, Redirect, Route, Router, StaticRouter, Switch, __RouterContext, generatePath, matchPath, useHistory, useLocation, useParams, useRouteMatch, withRouter, BrowserRouter, HashRouter, Link, NavLink */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
