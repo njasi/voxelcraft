@@ -368,7 +368,7 @@ function (_Component) {
               if (intersect.object !== this.plane) {
                 this.scene.remove(intersect.object); // TODO removing blocks
 
-                coords(intersect.object);
+                this.props.removeBlock(coords(intersect.object));
                 this.objects.splice(this.objects.indexOf(intersect.object), 1);
               }
 
@@ -431,7 +431,7 @@ function (_Component) {
 
       var rollOverGeo = new three__WEBPACK_IMPORTED_MODULE_2__["BoxBufferGeometry"](this.blockSize, this.blockSize, this.blockSize);
       this.rollOverMaterial = new three__WEBPACK_IMPORTED_MODULE_2__["MeshBasicMaterial"]({
-        color: 0xfd0000,
+        color: 0x0bb5ff,
         opacity: 0.5,
         transparent: true
       });
@@ -550,8 +550,10 @@ var mapDispatch = function mapDispatch(dispatch) {
     },
     setBlock: function setBlock(block) {
       return dispatch(Object(_store_blocks__WEBPACK_IMPORTED_MODULE_3__["setBlock"])(block));
-    } //   removeBlock : (pos) => dispatch(setBlock({...pos,type:"air"}))
-
+    },
+    removeBlock: function removeBlock(pos) {
+      return dispatch(Object(_store_blocks__WEBPACK_IMPORTED_MODULE_3__["removeBlock"])(pos));
+    }
   };
 };
 
@@ -640,15 +642,17 @@ react_dom__WEBPACK_IMPORTED_MODULE_1___default.a.render(react__WEBPACK_IMPORTED_
 /*!********************************!*\
   !*** ./client/store/blocks.js ***!
   \********************************/
-/*! exports provided: gotBlocks, blockWasSet, fetchBlocks, setBlock, default */
+/*! exports provided: gotBlocks, blockWasSet, blockWasRemoved, fetchBlocks, setBlock, removeBlock, default */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "gotBlocks", function() { return gotBlocks; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "blockWasSet", function() { return blockWasSet; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "blockWasRemoved", function() { return blockWasRemoved; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "fetchBlocks", function() { return fetchBlocks; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "setBlock", function() { return setBlock; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "removeBlock", function() { return removeBlock; });
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var react_toastify__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react-toastify */ "./node_modules/react-toastify/esm/react-toastify.js");
@@ -662,6 +666,7 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 
 var GOT_BLOCKS = "GOT_BLOCKS";
 var BLOCK_WAS_SET = "BLOCK_WAS_SET";
+var BLOCK_WAS_REMOVED = "BLOCK_WAS_REMOVED";
 var gotBlocks = function gotBlocks(blocks) {
   return {
     type: GOT_BLOCKS,
@@ -671,6 +676,12 @@ var gotBlocks = function gotBlocks(blocks) {
 var blockWasSet = function blockWasSet(block) {
   return {
     type: BLOCK_WAS_SET,
+    block: block
+  };
+};
+var blockWasRemoved = function blockWasRemoved(block) {
+  return {
+    type: BLOCK_WAS_REMOVED,
     block: block
   };
 };
@@ -691,15 +702,16 @@ var fetchBlocks = function fetchBlocks() {
             data = _ref.data;
             console.log("BLOCK DATA:\t", data);
             dispatch(gotBlocks(data));
-            _context.next = 12;
+            _context.next = 13;
             break;
 
           case 9:
             _context.prev = 9;
             _context.t0 = _context["catch"](0);
-            react_toastify__WEBPACK_IMPORTED_MODULE_1__["toast"].error("There was an error loading the blocks..." + _context.t0);
+            console.log(_context.t0);
+            react_toastify__WEBPACK_IMPORTED_MODULE_1__["toast"].error("There was an error loading the blocks...\n", _context.t0);
 
-          case 12:
+          case 13:
           case "end":
             return _context.stop();
         }
@@ -722,24 +734,64 @@ var setBlock = function setBlock(block) {
           case 3:
             _ref2 = _context2.sent;
             data = _ref2.data;
-            dispatch(gotBlocks(data));
-            _context2.next = 11;
+            console.log(data);
+            dispatch(blockWasSet(data[0]));
+            _context2.next = 12;
+            break;
+
+          case 9:
+            _context2.prev = 9;
+            _context2.t0 = _context2["catch"](0);
+            react_toastify__WEBPACK_IMPORTED_MODULE_1__["toast"].error("There was an error placing the block..\n", _context2.t0);
+
+          case 12:
+          case "end":
+            return _context2.stop();
+        }
+      }
+    }, null, null, [[0, 9]]);
+  };
+};
+var removeBlock = function removeBlock(block) {
+  return function _callee3(dispatch) {
+    var _ref3, data;
+
+    return regeneratorRuntime.async(function _callee3$(_context3) {
+      while (1) {
+        switch (_context3.prev = _context3.next) {
+          case 0:
+            _context3.prev = 0;
+            _context3.next = 3;
+            return regeneratorRuntime.awrap(axios__WEBPACK_IMPORTED_MODULE_0___default.a["delete"]("/api/blocks", {
+              data: block
+            }));
+
+          case 3:
+            _ref3 = _context3.sent;
+            data = _ref3.data;
+            dispatch(blockWasRemoved(data));
+            _context3.next = 12;
             break;
 
           case 8:
-            _context2.prev = 8;
-            _context2.t0 = _context2["catch"](0);
-            react_toastify__WEBPACK_IMPORTED_MODULE_1__["toast"].error("There was an error placing the block.");
+            _context3.prev = 8;
+            _context3.t0 = _context3["catch"](0);
+            console.log(_context3.t0);
+            react_toastify__WEBPACK_IMPORTED_MODULE_1__["toast"].error("There was an error removing the block...\n", _context3.t0);
 
-          case 11:
+          case 12:
           case "end":
-            return _context2.stop();
+            return _context3.stop();
         }
       }
     }, null, null, [[0, 8]]);
   };
 };
-var initialState = {};
+var initialState = [];
+
+var makeKey = function makeKey(block) {
+  return "".concat(block.xPos, ",").concat(block.yPos, ",").concat(block.yPos);
+};
 
 var reducer = function reducer() {
   var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
@@ -748,13 +800,46 @@ var reducer = function reducer() {
   switch (action.type) {
     case GOT_BLOCKS:
       {
+        var dict = {};
+        var _iteratorNormalCompletion = true;
+        var _didIteratorError = false;
+        var _iteratorError = undefined;
+
+        try {
+          for (var _iterator = action.blocks[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+            var block = _step.value;
+            dict[makeKey(block)] = block;
+          }
+        } catch (err) {
+          _didIteratorError = true;
+          _iteratorError = err;
+        } finally {
+          try {
+            if (!_iteratorNormalCompletion && _iterator["return"] != null) {
+              _iterator["return"]();
+            }
+          } finally {
+            if (_didIteratorError) {
+              throw _iteratorError;
+            }
+          }
+        }
+
         return action.blocks;
       }
 
     case BLOCK_WAS_SET:
       {
-        var key = "".concat(action.block.x, ",").concat(action.block.y);
+        var key = makeKey(action.block);
         return _objectSpread({}, state, _defineProperty({}, key, action.block));
+      }
+
+    case BLOCK_WAS_REMOVED:
+      {
+        var copy = _objectSpread({}, state);
+
+        delete copy[makeKey(action.block)];
+        return copy;
       }
 
     default:

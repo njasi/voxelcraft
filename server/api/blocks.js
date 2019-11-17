@@ -14,11 +14,23 @@ router.get("/", async (req, res, next) => {
 router.post("/", async (req, res, next) => {
   try {
     const { xPos, yPos, zPos, type } = req.body;
-    const block = await Block.create({ xPos, yPos, zPos, type });
+    const block = await Block.findOrCreate({
+      where: { xPos, yPos, zPos }
+    });
+    block[0].type = type;
+    await block[0].save();
     res.json(block).status(201);
   } catch (err) {
     next(err);
   }
 });
 
-// router.delete("/", async (req, res, next) => {});
+router.delete("/", async (req, res, next) => {
+  try {
+    const { xPos, yPos, zPos } = req.body;
+    const block = await Block.destroy({ where: { xPos, yPos, zPos } });
+    res.json(block).status(201);
+  } catch (err) {
+    next(err);
+  }
+});

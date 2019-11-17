@@ -1,7 +1,7 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import * as THREE from "three";
-import { fetchBlocks, setBlock } from "../store/blocks";
+import { fetchBlocks, setBlock, removeBlock } from "../store/blocks";
 const OrbitControls = require("three-orbit-controls")(THREE);
 
 function distanceFromOrigin(v) {
@@ -105,7 +105,7 @@ class Voxel extends Component {
           if (intersect.object !== this.plane) {
             this.scene.remove(intersect.object);
             // TODO removing blocks
-            coords(intersect.object);
+            this.props.removeBlock(coords(intersect.object));
             this.objects.splice(this.objects.indexOf(intersect.object), 1);
           }
           break;
@@ -185,7 +185,7 @@ class Voxel extends Component {
       this.blockSize
     );
     this.rollOverMaterial = new THREE.MeshBasicMaterial({
-      color: 0xfd0000,
+      color: 0x0bb5ff,
       opacity: 0.5,
       transparent: true
     });
@@ -236,7 +236,7 @@ class Voxel extends Component {
       const voxel = new THREE.Mesh(this.cubeGeo, this.cubeMaterial);
       const pos = new THREE.Vector3(
         block.xPos - 10,
-        block.yPos *-1 +19,
+        block.yPos * -1 + 19,
         block.zPos - 10
       );
       voxel.position
@@ -245,7 +245,7 @@ class Voxel extends Component {
         .add(pos)
         .multiplyScalar(this.blockSize)
         .addScalar(this.blockSize / 2);
-      console.log(voxel.position)
+      console.log(voxel.position);
       this.scene.add(voxel);
       this.objects.push(voxel);
     }
@@ -281,8 +281,8 @@ const mapProps = state => {
 const mapDispatch = dispatch => {
   return {
     load: () => dispatch(fetchBlocks()),
-    setBlock: block => dispatch(setBlock(block))
-    //   removeBlock : (pos) => dispatch(setBlock({...pos,type:"air"}))
+    setBlock: block => dispatch(setBlock(block)),
+    removeBlock: pos => dispatch(removeBlock(pos))
   };
 };
 
