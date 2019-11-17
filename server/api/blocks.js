@@ -4,7 +4,9 @@ module.exports = router;
 
 router.get("/", async (req, res, next) => {
   try {
-    const blocks = await Block.findAll();
+    const blocks = await Block.findAll({
+      attributes: ["xPos", "yPos", "zPos", "type"]
+    });
     res.json(blocks).status(200);
   } catch (error) {
     next(error);
