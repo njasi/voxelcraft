@@ -10,6 +10,9 @@ const Block = db.define("block", {
   },
   zPos: {
     type: Sequelize.INTEGER
+  },
+  type: {
+    type: Sequelize.STRING
   }
 });
 
