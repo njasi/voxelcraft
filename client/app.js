@@ -9,7 +9,6 @@ const App = () => {
   return (
     <div>
       <ToastContainer />
-      <Navbar />
       <Routes />
     </div>
   )
