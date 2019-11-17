@@ -133,7 +133,7 @@ __webpack_require__.r(__webpack_exports__);
     href: "https://github.com/njasi/voxelcraft"
   }, "github"), " -", " ", react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("a", {
     href: "#"
-  }, "presentation"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("br", null), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("strong", null, "right click"), ": add block, ", react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("strong", null, "left click"), ": remove block", react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("br", null), "made with", " ", react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("a", {
+  }, "presentation"), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("br", null), react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("strong", null, "right click"), ": add block, ", react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("strong", null, "left click"), ": remove block, ", react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("strong", null, "click + drag"), ": rotate", react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("br", null), "made with", " ", react__WEBPACK_IMPORTED_MODULE_0___default.a.createElement("a", {
     href: "https://threejs.org",
     target: "_blank",
     rel: "noopener"

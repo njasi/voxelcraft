@@ -6,7 +6,7 @@ export default () => (
     <a href="#">presentation</a>
     <br />
     <strong>right click</strong>: add block, <strong>left click</strong>: remove
-    block
+    block, <strong>click + drag</strong>: rotate
     <br />
     made with{" "}
     <a href="https://threejs.org" target="_blank" rel="noopener">
