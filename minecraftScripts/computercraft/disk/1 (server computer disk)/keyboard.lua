@@ -1,5 +1,5 @@
-local modem = peripheral.wrap("back")
 local target = peripheral.wrap("top")
+local modem = peripheral.wrap("right")
 
 local keyboard =       "` 1 2 3 4 5 6 7 8 9 0 - = del\ntab q w e r t y u i o p [ ] \\\ncaps a s d f g h j k l ; ' en\nshift z x c v b n m , . / \n            space            "
 local shift_keyboard = "~ ! @ # $ % ^ & * ( ) _ + del\ntab Q W E R T Y U I O P { } |\ncaps A S D F G H J K L : \" en\nshift Z X C V B N M < > ? \n            space            "

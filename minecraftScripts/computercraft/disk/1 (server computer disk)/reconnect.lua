@@ -1,0 +1,8 @@
+local monitor = peripheral.wrap("top")
+shell.run("monitor","top","clear")
+term.redirect(monitor)
+term.setBackgroundColor(colors.green)
+term.setTextColor(colors.black)
+print("tap to try to reconnect to voxelcraft.herokuapp.com")
+os.pullEvent("monitor_touch")
+shell.run("reboot")
