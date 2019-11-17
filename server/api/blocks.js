@@ -4,11 +4,8 @@ module.exports = router;
 
 router.get("/", async (req, res, next) => {
   try {
-    // const allcategory = await Block.findAll({
-    //   include: { model: Type, attributes: [req.attrs.split(",")] }
-    // });
-    // res.json(allcategory).status(200);
-    res.json("hello there!")
+    const allcategory = await Block.findAll({});
+    res.json(allcategory).status(200);
   } catch (error) {
     next(error);
   }
