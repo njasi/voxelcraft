@@ -154,9 +154,9 @@ class Voxel extends Component {
       10000
     );
     this.camera.position.set(
+      this.blockSize * -18,
       this.blockSize * 18,
-      this.blockSize * 18,
-      this.blockSize * 18
+      this.blockSize * -18
     );
     this.camera.lookAt(0, 0, 0);
 

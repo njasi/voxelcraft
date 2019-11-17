@@ -417,7 +417,7 @@ function (_Component) {
       this.renderer.setPixelRatio(window.devicePixelRatio);
       this.renderer.setSize(window.innerWidth, window.innerHeight);
       this.camera = new three__WEBPACK_IMPORTED_MODULE_2__["PerspectiveCamera"](45, window.innerWidth / window.innerHeight, 1, 10000);
-      this.camera.position.set(this.blockSize * 18, this.blockSize * 18, this.blockSize * 18);
+      this.camera.position.set(this.blockSize * -18, this.blockSize * 18, this.blockSize * -18);
       this.camera.lookAt(0, 0, 0);
       this.controls = new OrbitControls(this.camera, this.renderer.domElement);
       this.controls.minDistance = 10;
