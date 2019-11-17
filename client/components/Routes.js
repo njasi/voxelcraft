@@ -7,7 +7,8 @@ class Routes extends Component {
   render() {
     return (
       <Switch>
-        <Route exact path="/home" component={Voxel} />
+        <Route exact path="/" component={Voxel} />
+        <Redirect to="/" />
       </Switch>
     );
   }

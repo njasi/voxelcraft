@@ -1,7 +1,8 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import * as THREE from "three";
-const OrbitControls = require( 'three-orbit-controls' )( THREE );
+import Info from "./Info";
+const OrbitControls = require("three-orbit-controls")(THREE);
 
 function distanceFromOrigin(v) {
   return Math.sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
@@ -55,7 +56,7 @@ class Voxel extends Component {
   }
 
   onDocumentMouseMove(event) {
-    event.preventDefault();
+    // event.preventDefault();
     this.mouse.set(
       (event.clientX / window.innerWidth) * 2 - 1,
       -(event.clientY / window.innerHeight) * 2 + 1
@@ -77,7 +78,8 @@ class Voxel extends Component {
   }
 
   onDocumentMouseDown(event) {
-    event.preventDefault();
+    console.log(event.target)
+    // event.preventDefault();
 
     if (event.ctrlKey) {
       this.camera.rotation.y += 0.1;
@@ -152,10 +154,7 @@ class Voxel extends Component {
     );
     this.camera.lookAt(0, 0, 0);
 
-    this.controls = new OrbitControls(
-      this.camera,
-      this.renderer.domElement
-    );
+    this.controls = new OrbitControls(this.camera, this.renderer.domElement);
     this.controls.target.set(0, 0, 0);
     this.controls.update();
 
@@ -238,7 +237,11 @@ class Voxel extends Component {
   }
 
   render() {
-    return <div ref={ref => (this.mount = ref)} />;
+    return (
+      <React.Fragment>
+        <div ref={ref => (this.mount = ref)} />
+      </React.Fragment>
+    );
   }
 }
 

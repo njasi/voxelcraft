@@ -44,7 +44,7 @@ const startListening = () => {
   )
 
   // const io = socketio(server)
-  require('./socket')(io)
+  // require('./socket')(io)
 }
 
 const syncDb = () => db.sync()

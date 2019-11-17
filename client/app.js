@@ -1,17 +1,18 @@
-import React from 'react'
+import React from "react";
 
-import {Navbar, Routes} from './components'
+import { Info, Routes } from "./components";
 
-import {ToastContainer} from 'react-toastify'
-import "!style-loader!css-loader!react-toastify/dist/ReactToastify.css"
+import { ToastContainer } from "react-toastify";
+import "!style-loader!css-loader!react-toastify/dist/ReactToastify.css";
 
 const App = () => {
   return (
     <div>
       <ToastContainer />
+      <Info />
       <Routes />
     </div>
-  )
-}
+  );
+};
 
-export default App
+export default App;
